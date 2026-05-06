@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Video Enhancer — Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <!-- ===== Ambient glow blobs ===== -->
+  <div class="ambient-blob blob-1"></div>
+  <div class="ambient-blob blob-2"></div>
+  <div class="ambient-blob blob-3"></div>
+
+  <div class="app">
+    <!-- ===== Sidebar ===== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <svg width="32" height="32" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="8" fill="url(#gs1)" />
+          <path d="M10 8.5v11l9-5.5-9-5.5z" fill="#fff" fill-opacity="0.9"/>
+          <defs><linearGradient id="gs1" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+        </svg>
+        <span>Video Enhancer</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-section="general">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          General
+        </button>
+        <button class="nav-item" data-section="subtitle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/></svg>
+          Subtitle
+        </button>
+        <button class="nav-item" data-section="adblock">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+          Ad Blocker
+        </button>
+        <button class="nav-item" data-section="domains">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Domains
+        </button>
+        <button class="nav-item" data-section="shortcuts">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"/></svg>
+          Shortcuts
+        </button>
+        <button class="nav-item" data-section="about">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          About
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="version-badge">v1.0.0</span>
+      </div>
+    </aside>
+
+    <!-- ===== Main Content ===== -->
+    <main class="main">
+      <!-- ===== General Section ===== -->
+      <section class="section active" id="section-general">
+        <div class="section-header">
+          <h2>General Settings</h2>
+          <p>Configure core behavior of Video Enhancer.</p>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Global Enable</h3>
+              <p>Master switch — disables the extension on all sites when off.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="globalEnabled" checked />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Show Floating Panel</h3>
+              <p>Display the seek & subtitle control bar above the video player.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="showPanel" checked />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Auto-detect Video</h3>
+              <p>Automatically find and attach to the largest visible video element.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="autoDetect" checked />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Auto-Pause on Tab Switch</h3>
+              <p>Automatically pause the video when you switch tabs or minimize the window.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="autoPause" />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Bypass Site Auto-Pause</h3>
+              <p>Prevent websites from automatically pausing the video when you switch tabs (forces background play).</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="bypassSiteAutoPause" />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Panel Opacity</h3>
+              <p>Adjust the transparency of the floating control panel.</p>
+            </div>
+            <div class="range-wrap">
+              <input type="range" id="panelOpacity" min="30" max="100" value="72" class="range-input" />
+              <span class="range-value" id="panelOpacityVal">72%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Subtitle Section ===== -->
+      <section class="section" id="section-subtitle">
+        <div class="section-header">
+          <h2>Subtitle Appearance</h2>
+          <p>Customize how subtitles are displayed over the video.</p>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Font Size</h3>
+              <p>Base font size for subtitle text (px).</p>
+            </div>
+            <div class="range-wrap">
+              <input type="range" id="subFontSize" min="12" max="48" value="22" class="range-input" />
+              <span class="range-value" id="subFontSizeVal">22px</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Font Color</h3>
+              <p>Text color for subtitles.</p>
+            </div>
+            <div class="color-pick">
+              <input type="color" id="subFontColor" value="#ffffff" class="color-input" />
+              <span class="color-hex" id="subFontColorHex">#ffffff</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Background Color</h3>
+              <p>Background behind subtitle text.</p>
+            </div>
+            <div class="color-pick">
+              <input type="color" id="subBgColor" value="#000000" class="color-input" />
+              <span class="color-hex" id="subBgColorHex">#000000</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Background Opacity</h3>
+              <p>Transparency of the subtitle background.</p>
+            </div>
+            <div class="range-wrap">
+              <input type="range" id="subBgOpacity" min="0" max="100" value="70" class="range-input" />
+              <span class="range-value" id="subBgOpacityVal">70%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Text Shadow</h3>
+              <p>Add shadow behind subtitle text for readability.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="subTextShadow" checked />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Position from Bottom</h3>
+              <p>Distance of subtitles from the bottom edge (%).</p>
+            </div>
+            <div class="range-wrap">
+              <input type="range" id="subBottom" min="2" max="40" value="12" class="range-input" />
+              <span class="range-value" id="subBottomVal">12%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Preview -->
+        <div class="card card--preview">
+          <h3>Preview</h3>
+          <div class="subtitle-preview" id="subtitlePreview">
+            <div class="preview-video-bg"></div>
+            <div class="preview-sub" id="previewSub">
+              <span id="previewSubText">This is a subtitle preview line.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Ad Blocker Section ===== -->
+      <section class="section" id="section-adblock">
+        <div class="section-header">
+          <h2>Ad Redirect Blocker</h2>
+          <p>Manage the list of domains blocked when clicking inside a video player.</p>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Enable Anti-Redirect</h3>
+              <p>Block clicks that would redirect to known ad domains.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="antiRedirect" checked />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Block Outside Iframes</h3>
+              <p>Automatically remove hidden/ad iframes injected outside the main page body.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="blockOutsideIframes" checked />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="setting-row vertical">
+            <div class="setting-info" style="margin-bottom:12px;">
+              <h3>Blocked Domains</h3>
+              <p>One domain per line. Prefix patterns (e.g. <code>track.</code>) match subdomains.</p>
+            </div>
+            <textarea id="adDomains" class="textarea" rows="12" spellcheck="false"></textarea>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn--ghost" id="resetAdDomains">Reset to Default</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Domains Section ===== -->
+      <section class="section" id="section-domains">
+        <div class="section-header">
+          <h2>Per-Site Settings</h2>
+          <p>View and manage which domains have the extension enabled or disabled.</p>
+        </div>
+
+        <div class="card">
+          <div class="domain-list" id="domainList">
+            <div class="domain-empty">No domain-specific settings saved yet.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Shortcuts Section ===== -->
+      <section class="section" id="section-shortcuts">
+        <div class="section-header">
+          <h2>Keyboard Shortcuts</h2>
+          <p>Custom key bindings when the video player is focused.</p>
+        </div>
+
+        <div class="card">
+          <div class="shortcut-row">
+            <span class="shortcut-label">Seek −5 seconds</span>
+            <kbd class="kbd" id="kbdSeekBack5">←</kbd>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">Seek +5 seconds</span>
+            <kbd class="kbd" id="kbdSeekFwd5">→</kbd>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">Seek −1 minute</span>
+            <kbd class="kbd" id="kbdSeekBack60">Shift + ←</kbd>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">Seek +1 minute</span>
+            <kbd class="kbd" id="kbdSeekFwd60">Shift + →</kbd>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-label">Toggle Subtitles</span>
+            <kbd class="kbd" id="kbdToggleSub">S</kbd>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <h3>Enable Keyboard Shortcuts</h3>
+              <p>Allow keyboard shortcuts when hovering over or focusing on the video player.</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="enableShortcuts" checked />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== About Section ===== -->
+      <section class="section" id="section-about">
+        <div class="section-header">
+          <h2>About</h2>
+          <p>Video Enhancer browser extension.</p>
+        </div>
+
+        <div class="card about-card">
+          <div class="about-logo">
+            <svg width="56" height="56" viewBox="0 0 28 28" fill="none">
+              <rect width="28" height="28" rx="8" fill="url(#ga)" />
+              <path d="M10 8.5v11l9-5.5-9-5.5z" fill="#fff" fill-opacity="0.9"/>
+              <defs><linearGradient id="ga" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs>
+            </svg>
+          </div>
+          <h3>Video Enhancer</h3>
+          <p class="about-version">Version 1.0.0 · Manifest V3</p>
+          <p class="about-desc">Enhance any video player with custom seek controls, local subtitle overlay, and anti-redirect protection. Works on virtually every streaming site.</p>
+          <div class="about-features">
+            <div class="about-feat">
+              <span class="feat-icon">🎯</span>
+              <span>Robust video detection via MutationObserver</span>
+            </div>
+            <div class="about-feat">
+              <span class="feat-icon">🔤</span>
+              <span>SRT & VTT subtitle support with live sync</span>
+            </div>
+            <div class="about-feat">
+              <span class="feat-icon">🛡️</span>
+              <span>Anti-redirect ad blocker</span>
+            </div>
+            <div class="about-feat">
+              <span class="feat-icon">⚡</span>
+              <span>Lightweight & performant</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== Save Toast ===== -->
+      <div class="save-toast" id="saveToast">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Settings saved
+      </div>
+    </main>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
