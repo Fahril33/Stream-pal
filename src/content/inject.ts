@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* ============================================================
    Video Enhancer - MAIN World Inject (Fixed)
    ============================================================ */
@@ -34,41 +35,12 @@
     },
   });
 
-  // ─── 2. Intercept addEventListener (wrap, jangan drop) ────
-  // Hanya blokir event visibility/window-level blur, bukan semua blur
+  // ─── 2. Event sets ─────────────────────────────────────────
   const PAGE_PAUSE_EVENTS = new Set([
     "visibilitychange",
     "webkitvisibilitychange",
     "mozvisibilitychange",
   ]);
-
-  // Window-level blur/freeze (penyebab pause) — bukan blur pada elemen
-  const WINDOW_PAUSE_EVENTS = new Set(["blur", "pagehide", "freeze"]);
-
-  const originalAEL = EventTarget.prototype.addEventListener;
-  EventTarget.prototype.addEventListener = function (type, listener, options) {
-    // Selektif: hanya blokir blur jika target adalah window/document
-    const isWindowTarget = this === window || this === document;
-    const shouldWrap =
-      PAGE_PAUSE_EVENTS.has(type) ||
-      (isWindowTarget && WINDOW_PAUSE_EVENTS.has(type));
-
-    if (shouldWrap) {
-      const wrapped = function (e) {
-        if (isEnabled()) return; // bypass aktif: skip handler site
-        if (typeof listener === "function") {
-          listener.call(this, e);
-        } else if (listener?.handleEvent) {
-          listener.handleEvent(e);
-        }
-      };
-      // Simpan referensi asli untuk removeEventListener
-      wrapped._original = listener;
-      return originalAEL.call(this, type, wrapped, options);
-    }
-
-    return originalAEL.call(this, type, listener, options);
-  };
 
   // ─── 3. Blokir dispatchEvent untuk event pause ────────────
   const originalDispatch = EventTarget.prototype.dispatchEvent;

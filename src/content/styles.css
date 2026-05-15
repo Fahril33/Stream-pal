@@ -1,0 +1,420 @@
+/* ============================================================
+   Video Enhancer – Injected Styles
+   ============================================================ */
+
+/* ---------- Floating Control Panel ---------- */
+.ve-panel {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  background: rgba(10, 10, 18, 0.72);
+  backdrop-filter: blur(14px) saturate(1.6);
+  -webkit-backdrop-filter: blur(14px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 0.5px 0 rgba(255, 255, 255, 0.06);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  user-select: none;
+}
+
+.ve-panel.ve-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Show panel on hover over the wrapper */
+.ve-wrapper:hover .ve-panel,
+.ve-panel:hover {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---------- Panel Buttons ---------- */
+.ve-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 30px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #e0e0e8;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.12s ease;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.ve-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+.ve-btn:active {
+  transform: scale(0.96);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.ve-btn--accent {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+}
+
+.ve-btn--accent:hover {
+  background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.5);
+}
+
+.ve-btn--accent:active {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+/* Divider between button groups */
+.ve-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.ve-subtitle-info {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  cursor: pointer;
+  overflow: hidden;
+  transition: width 0.25s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.ve-subtitle-info.ve-subtitle-info--expanded {
+  width: 240px;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 2px 8px;
+  overflow: visible;
+}
+
+.ve-subtitle-info.ve-subtitle-info--collapsed .ve-subtitle-info__text,
+.ve-subtitle-info.ve-subtitle-info--collapsed .ve-subtitle-info__indicator,
+.ve-subtitle-info.ve-subtitle-info--collapsed .ve-subtitle-menu {
+  display: none !important;
+}
+
+.ve-subtitle-info--active {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.14);
+}
+
+.ve-subtitle-info__import {
+  width: 26px;
+  min-width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ve-subtitle-info__text {
+  min-width: 0;
+  max-width: 0;
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  transition: opacity 0.16s ease, max-width 0.2s ease;
+}
+
+.ve-subtitle-info.ve-subtitle-info--expanded .ve-subtitle-info__text {
+  max-width: 190px;
+  opacity: 1;
+}
+
+.ve-subtitle-info__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #f3f4f6;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ve-subtitle-info__meta-text {
+  display: inline-block;
+  min-width: 0;
+  padding-right: 20px;
+  white-space: nowrap;
+  animation: ve-marquee 9s linear infinite;
+}
+
+.ve-subtitle-toggle {
+  display: none;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-size: 11px;
+}
+
+.ve-subtitle-toggle.is-off {
+  color: #f87171;
+}
+
+.ve-subtitle-info.ve-subtitle-info--expanded .ve-subtitle-toggle {
+  display: block;
+}
+
+.ve-subtitle-info__progress {
+  margin-top: 0;
+  color: #cbd5e1;
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.ve-subtitle-info__indicator {
+  margin-left: auto;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #dbeafe;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.ve-subtitle-info.ve-subtitle-info--expanded .ve-subtitle-info__indicator {
+  display: inline-flex;
+}
+
+.ve-subtitle-info__indicator:hover {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(148, 163, 184, 0.55);
+}
+
+.ve-subtitle-menu {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  min-width: 140px;
+  padding: 6px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.ve-subtitle-menu--open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.ve-subtitle-menu__item {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #e2e8f0;
+  font-size: 11px;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.ve-subtitle-menu__item:hover {
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.ve-subtitle-menu__offset {
+  margin-top: 4px;
+  padding: 6px 8px 3px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  color: #93c5fd;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.ve-subtitle-menu__hr {
+  height: 1px;
+  background: rgba(148, 163, 184, 0.2);
+  margin: 4px 6px;
+}
+
+.ve-subtitle-toggle {
+  text-align: left !important;
+  font-weight: 700 !important;
+  color: #10b981 !important;
+}
+
+.ve-subtitle-toggle.is-off {
+  color: #f87171 !important;
+}
+
+.ve-subtitle-toggle::before {
+  content: "Subtitle: ";
+  color: #94a3b8;
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+@keyframes ve-marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-45%);
+  }
+}
+
+/* ---------- Subtitle Overlay ---------- */
+.ve-subtitle-overlay {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483646;
+  max-width: 80%;
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.ve-subtitle-text {
+  display: inline-block;
+  padding: 6px 18px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+  font-size: clamp(16px, 2.4vw, 28px);
+  font-weight: 600;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  line-height: 1.45;
+  text-shadow:
+    0 0 4px rgba(0, 0, 0, 0.9),
+    0 1px 6px rgba(0, 0, 0, 0.7),
+    1px 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.01em;
+  word-break: break-word;
+}
+
+/* ---------- Hidden file input ---------- */
+.ve-file-input {
+  display: none !important;
+}
+
+/* ---------- Wrapper for positioning ---------- */
+.ve-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* ---------- Toast Notification ---------- */
+.ve-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2147483647;
+  padding: 10px 20px;
+  border-radius: 10px;
+  background: rgba(10, 10, 18, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e0e0e8;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.ve-toast.ve-toast--show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ve-toast--success {
+  border-left: 3px solid #22c55e;
+}
+
+.ve-toast--error {
+  border-left: 3px solid #ef4444;
+}
+
+.ve-toast--info {
+  border-left: 3px solid #6366f1;
+}
+
+/* ---------- Disabled State ---------- */
+.ve-panel.ve-disabled {
+  display: none !important;
+}
+
+.ve-subtitle-overlay.ve-disabled {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .ve-subtitle-info {
+    height: 28px;
+    width: 28px;
+  }
+
+  .ve-subtitle-info:hover {
+    width: 200px;
+  }
+
+  .ve-subtitle-info:hover .ve-subtitle-info__text {
+    max-width: 125px;
+  }
+}

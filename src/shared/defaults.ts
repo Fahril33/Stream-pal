@@ -1,0 +1,33 @@
+import type { ExtensionSettings } from './types';
+
+export const DEFAULT_SETTINGS: ExtensionSettings = {
+  globalEnabled: true,
+  showPanel: true,
+  autoDetect: true,
+  autoPause: false,
+  bypassSiteAutoPause: false,
+  panelOpacity: 72,
+  subFontSize: 22,
+  subFontColor: '#ffffff',
+  subBgColor: '#000000',
+  subBgOpacity: 70,
+  subTextShadow: true,
+  subBottom: 12,
+  antiRedirect: true,
+  blockOutsideIframes: true,
+  enableShortcuts: true,
+  adDomains: [
+    'doubleclick.net', 'googlesyndication.com', 'googleadservices.com',
+    'adclick.g.doubleclick.net', 'adservice.google.com',
+    'ads.yahoo.com', 'ad.doubleclick.net',
+    'popads.net', 'popcash.net', 'propellerads.com',
+    'adcash.com', 'adsterra.com', 'admaven.com',
+    'trafficjunky.com', 'exoclick.com', 'juicyads.com',
+    'clickadu.com', 'hilltopads.com', 'evadav.com',
+    'pushground.com', 'richpush.com', 'megapush.com',
+    'ad-maven.com', 'adnium.com', 'tsyndicate.com',
+    'revenuehits.com', 'bidvertiser.com',
+    'track.', 'click.', 'rdr.', 'redirect.',
+  ],
+  lyricsOffset: 0,
+};

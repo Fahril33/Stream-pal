@@ -1,3 +1,5 @@
+// @ts-nocheck
+import './styles.css';
 /* ============================================================
    Video Enhancer – Content Script
    ============================================================
@@ -46,6 +48,7 @@
       'revenuehits.com', 'bidvertiser.com',
       'track.', 'click.', 'rdr.', 'redirect.',
     ],
+    lyricsOffset: 0,
   };
 
   // ---- State ----
@@ -55,9 +58,24 @@
   let panelEl = null;
   let subtitleOverlay = null;
   let subtitleTextEl = null;
+  let subtitleInfoEl = null;
+  let subtitleImportBtnEl = null;
+  let subtitleMetaEl = null;
+  let subtitleMetaTextEl = null;
+  let subtitleProgressEl = null;
+  let subtitleStatusTextEl = null;
+  let subtitleIndicatorEl = null;
+  let subtitleToggleEl = null;
+  let subtitleMenuEl = null;
+  let subtitleMenuOffsetEl = null;
+  let subtitleMenuDocHandler = null;
+  let subtitleInfoExpanded = false;
   let wrapperEl = null;
   let fileInput = null;
   let subtitleCues = [];
+  let loadedSubtitleName = '';
+  let subtitleOffsetSec = 0;
+  let subtitleVisible = true;
   let syncRAF = null;
   let toastTimeout = null;
   const hostname = location.hostname;
@@ -212,20 +230,94 @@
   }
 
   let lastDisplayedText = '';
+  let lastActiveCueIndex = -1;
+
+  function formatClock(totalSeconds) {
+    if (!Number.isFinite(totalSeconds) || totalSeconds < 0) totalSeconds = 0;
+    const sec = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
+    const min = Math.floor((totalSeconds / 60) % 60).toString().padStart(2, '0');
+    const hour = Math.floor(totalSeconds / 3600);
+    return hour > 0 ? `${hour}:${min}:${sec}` : `${min}:${sec}`;
+  }
+
+  function formatOffset(offsetSec) {
+    const sign = offsetSec >= 0 ? '+' : '−';
+    return `${sign}${Math.abs(offsetSec).toFixed(1)}s`;
+  }
+
+  function setSubtitleInfoExpanded(expanded) {
+    subtitleInfoExpanded = Boolean(expanded);
+    if (!subtitleInfoEl) return;
+    subtitleInfoEl.classList.toggle('ve-subtitle-info--expanded', subtitleInfoExpanded);
+    subtitleInfoEl.classList.toggle('ve-subtitle-info--collapsed', !subtitleInfoExpanded);
+    if (subtitleMenuEl && !subtitleInfoExpanded) {
+      subtitleMenuEl.classList.remove('ve-subtitle-menu--open');
+    }
+  }
+
+  function updateSubtitleTitleMarquee() {
+    if (!subtitleMetaTextEl) return;
+    // Only marquee when subtitle selected and text really overflows
+    if (subtitleCues.length === 0) {
+      subtitleMetaTextEl.classList.remove('ve-subtitle-info__meta-text--marquee');
+      return;
+    }
+    requestAnimationFrame(() => {
+      if (!subtitleMetaTextEl) return;
+      const hasOverflow = subtitleMetaTextEl.scrollWidth > subtitleMetaTextEl.clientWidth + 4;
+      subtitleMetaTextEl.classList.toggle('ve-subtitle-info__meta-text--marquee', hasOverflow);
+    });
+  }
+
+  function updateSubtitlePanelInfo(currentTime = 0, status = 'IDLE') {
+    if (!subtitleInfoEl || !subtitleMetaEl || !subtitleProgressEl || !subtitleIndicatorEl) return;
+    if (subtitleToggleEl) {
+      subtitleToggleEl.textContent = subtitleVisible ? 'ON' : 'OFF';
+      subtitleToggleEl.classList.toggle('is-off', !subtitleVisible);
+    }
+
+    if (subtitleCues.length === 0) {
+      subtitleInfoEl.classList.remove('ve-subtitle-info--active');
+      if (subtitleMetaTextEl) subtitleMetaTextEl.textContent = 'No Selected';
+      updateSubtitleTitleMarquee();
+      if (subtitleStatusTextEl) subtitleStatusTextEl.textContent = 'NO FILE • Klik untuk Import subtitle';
+      subtitleIndicatorEl.setAttribute('aria-label', 'Subtitle settings');
+      if (subtitleMenuOffsetEl) subtitleMenuOffsetEl.textContent = `Offset ${formatOffset(subtitleOffsetSec)}`;
+      return;
+    }
+
+    subtitleInfoEl.classList.add('ve-subtitle-info--active');
+    const subtitleLabel = loadedSubtitleName || 'Custom subtitle';
+    if (subtitleMetaTextEl) subtitleMetaTextEl.textContent = subtitleLabel;
+    updateSubtitleTitleMarquee();
+    if (subtitleStatusTextEl) subtitleStatusTextEl.textContent = `${status} • ${formatClock(currentTime)}`;
+    subtitleIndicatorEl.setAttribute('aria-label', 'Subtitle settings');
+    if (subtitleMenuOffsetEl) subtitleMenuOffsetEl.textContent = `Offset ${formatOffset(subtitleOffsetSec)}`;
+  }
 
   function syncSubtitles() {
     if (!activeVideo || !subtitleTextEl || subtitleCues.length === 0) {
+      updateSubtitlePanelInfo(activeVideo?.currentTime || 0, 'NO FILE');
       syncRAF = requestAnimationFrame(syncSubtitles);
       return;
     }
 
     const t = activeVideo.currentTime;
-    const cue = findCue(t);
+    const adjustedTime = Math.max(0, t + subtitleOffsetSec);
+    const cue = findCue(adjustedTime);
+    let status = 'IDLE';
+    if (!subtitleVisible) status = 'HIDDEN';
+    else if (activeVideo.ended) status = 'ENDED';
+    else if (activeVideo.paused) status = 'PAUSED';
+    else if (cue) status = 'LIVE';
+    updateSubtitlePanelInfo(t, status);
+    const cueIndex = cue ? subtitleCues.indexOf(cue) : -1;
+    if (cueIndex !== lastActiveCueIndex || !cue) lastActiveCueIndex = cueIndex;
 
     if (cue) {
       if (cue.text !== lastDisplayedText) {
         subtitleTextEl.innerHTML = cue.text.replace(/\n/g, '<br>');
-        subtitleOverlay.style.opacity = '1';
+        subtitleOverlay.style.opacity = subtitleVisible ? '1' : '0';
         lastDisplayedText = cue.text;
       }
     } else {
@@ -234,6 +326,8 @@
         subtitleOverlay.style.opacity = '0';
         lastDisplayedText = '';
       }
+      updateSubtitlePanelInfo(t);
+      lastActiveCueIndex = -1;
     }
 
     syncRAF = requestAnimationFrame(syncSubtitles);
@@ -323,7 +417,7 @@
 
     // -- Panel --
     panelEl = document.createElement('div');
-    panelEl.className = 've-panel';
+    panelEl.className = 've-panel ve-panel-root';
     if (!extensionEnabled || !settings.showPanel) panelEl.classList.add('ve-disabled');
 
     // Apply panel opacity from settings
@@ -340,7 +434,13 @@
 
     seekButtons.forEach((btn, idx) => {
       const el = document.createElement('button');
-      el.className = 've-btn';
+      el.className = 've-btn ve-panel__btn ve-panel__btn--seek';
+      if (btn.delta < 0) el.classList.add('ve-panel__btn--seek-back');
+      if (btn.delta > 0) el.classList.add('ve-panel__btn--seek-forward');
+      if (btn.delta === -60) el.classList.add('ve-panel__btn--seek-back-60');
+      if (btn.delta === -5) el.classList.add('ve-panel__btn--seek-back-5');
+      if (btn.delta === 5) el.classList.add('ve-panel__btn--seek-forward-5');
+      if (btn.delta === 60) el.classList.add('ve-panel__btn--seek-forward-60');
       el.textContent = btn.label;
       el.title = `Seek ${btn.delta > 0 ? '+' : ''}${btn.delta}s`;
       el.addEventListener('click', (e) => {
@@ -359,33 +459,152 @@
       // Add divider after first two buttons
       if (idx === 1) {
         const divider = document.createElement('span');
-        divider.className = 've-divider';
+        divider.className = 've-divider ve-panel__divider ve-panel__divider--seek-group';
         panelEl.appendChild(divider);
       }
     });
 
     // Divider before subtitle button
     const divider2 = document.createElement('span');
-    divider2.className = 've-divider';
+    divider2.className = 've-divider ve-panel__divider ve-panel__divider--before-subtitle';
     panelEl.appendChild(divider2);
 
-    // Subtitle load button
-    const subBtn = document.createElement('button');
-    subBtn.className = 've-btn ve-btn--accent';
-    subBtn.textContent = '🔤 Subtitle';
-    subBtn.title = 'Load .srt or .vtt subtitle file';
-    subBtn.addEventListener('click', (e) => {
+    // Subtitle import + status (single container)
+    subtitleInfoEl = document.createElement('div');
+    subtitleInfoEl.className = 've-subtitle-info ve-panel__subtitle-info ve-subtitle-info--collapsed';
+    subtitleInfoEl.title = 'Subtitle controls';
+    subtitleInfoEl.addEventListener('mouseenter', () => setSubtitleInfoExpanded(true));
+    subtitleInfoEl.addEventListener('mouseleave', () => {
+      const isMenuOpen = subtitleMenuEl && subtitleMenuEl.classList.contains('ve-subtitle-menu--open');
+      if (!isMenuOpen) {
+        setSubtitleInfoExpanded(false);
+      }
+    });
+
+    subtitleImportBtnEl = document.createElement('button');
+    subtitleImportBtnEl.className = 've-btn ve-btn--accent ve-panel__btn ve-panel__btn--subtitle ve-subtitle-info__import';
+    subtitleImportBtnEl.type = 'button';
+    subtitleImportBtnEl.setAttribute('aria-label', 'Import subtitle');
+    subtitleImportBtnEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M8 5H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-4"/></svg>';
+    subtitleImportBtnEl.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
       if (fileInput) fileInput.click();
     });
-    panelEl.appendChild(subBtn);
+    subtitleInfoEl.appendChild(subtitleImportBtnEl);
+
+    const subtitleTextWrap = document.createElement('div');
+    subtitleTextWrap.className = 've-subtitle-info__text';
+    subtitleMetaEl = document.createElement('div');
+    subtitleMetaEl.className = 've-subtitle-info__meta ve-panel__subtitle-meta';
+    subtitleMetaTextEl = document.createElement('span');
+    subtitleMetaTextEl.className = 've-subtitle-info__meta-text';
+    subtitleMetaEl.appendChild(subtitleMetaTextEl);
+
+    subtitleToggleEl = document.createElement('button');
+    subtitleToggleEl.className = 've-subtitle-toggle';
+    subtitleToggleEl.type = 'button';
+    subtitleToggleEl.textContent = 'ON';
+    subtitleToggleEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      subtitleVisible = !subtitleVisible;
+      if (subtitleOverlay) subtitleOverlay.style.display = subtitleVisible ? '' : 'none';
+      updateSubtitlePanelInfo(activeVideo?.currentTime || 0, subtitleVisible ? 'IDLE' : 'HIDDEN');
+      showToast(subtitleVisible ? 'Subtitles shown' : 'Subtitles hidden', 'info');
+    });
+    subtitleProgressEl = document.createElement('div');
+    subtitleProgressEl.className = 've-subtitle-info__progress ve-panel__subtitle-progress';
+    subtitleStatusTextEl = document.createElement('span');
+    subtitleStatusTextEl.className = 've-subtitle-info__status-text';
+    subtitleProgressEl.appendChild(subtitleStatusTextEl);
+    subtitleTextWrap.appendChild(subtitleMetaEl);
+    subtitleTextWrap.appendChild(subtitleProgressEl);
+    subtitleInfoEl.appendChild(subtitleTextWrap);
+
+    subtitleIndicatorEl = document.createElement('button');
+    subtitleIndicatorEl.className = 've-subtitle-info__indicator ve-panel__subtitle-indicator';
+    subtitleIndicatorEl.type = 'button';
+    subtitleIndicatorEl.textContent = '⋯';
+    subtitleIndicatorEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!subtitleMenuEl) return;
+      setSubtitleInfoExpanded(true);
+      subtitleMenuEl.classList.toggle('ve-subtitle-menu--open');
+    });
+    subtitleInfoEl.appendChild(subtitleIndicatorEl);
+
+    subtitleMenuEl = document.createElement('div');
+    subtitleMenuEl.className = 've-subtitle-menu';
+    subtitleMenuEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    const offsetMinusBtn = document.createElement('button');
+    offsetMinusBtn.className = 've-subtitle-menu__item';
+    offsetMinusBtn.type = 'button';
+    offsetMinusBtn.textContent = 'Offset -0.5s';
+    offsetMinusBtn.addEventListener('click', () => {
+      subtitleOffsetSec = Math.max(-10, subtitleOffsetSec - 0.5);
+      updateSubtitlePanelInfo(activeVideo?.currentTime || 0);
+      showToast(`Subtitle offset ${formatOffset(subtitleOffsetSec)}`, 'info');
+    });
+
+    const offsetPlusBtn = document.createElement('button');
+    offsetPlusBtn.className = 've-subtitle-menu__item';
+    offsetPlusBtn.type = 'button';
+    offsetPlusBtn.textContent = 'Offset +0.5s';
+    offsetPlusBtn.addEventListener('click', () => {
+      subtitleOffsetSec = Math.min(10, subtitleOffsetSec + 0.5);
+      updateSubtitlePanelInfo(activeVideo?.currentTime || 0);
+      showToast(`Subtitle offset ${formatOffset(subtitleOffsetSec)}`, 'info');
+    });
+
+    const offsetResetBtn = document.createElement('button');
+    offsetResetBtn.className = 've-subtitle-menu__item';
+    offsetResetBtn.type = 'button';
+    offsetResetBtn.textContent = 'Reset Offset';
+    offsetResetBtn.addEventListener('click', () => {
+      subtitleOffsetSec = 0;
+      updateSubtitlePanelInfo(activeVideo?.currentTime || 0);
+      showToast('Subtitle offset reset', 'info');
+    });
+
+    subtitleMenuOffsetEl = document.createElement('div');
+    subtitleMenuOffsetEl.className = 've-subtitle-menu__offset';
+
+    subtitleMenuEl.appendChild(offsetMinusBtn);
+    subtitleMenuEl.appendChild(offsetPlusBtn);
+    subtitleMenuEl.appendChild(offsetResetBtn);
+    subtitleMenuEl.appendChild(subtitleMenuOffsetEl);
+
+    const menuHr = document.createElement('div');
+    menuHr.className = 've-subtitle-menu__hr';
+    subtitleMenuEl.appendChild(menuHr);
+
+    subtitleToggleEl.className = 've-subtitle-menu__item ve-subtitle-toggle';
+    subtitleMenuEl.appendChild(subtitleToggleEl);
+
+    subtitleInfoEl.appendChild(subtitleMenuEl);
+    subtitleMenuDocHandler = (evt) => {
+      if (!subtitleMenuEl || !subtitleInfoEl) return;
+      if (!subtitleInfoEl.contains(evt.target)) {
+        subtitleMenuEl.classList.remove('ve-subtitle-menu--open');
+        setSubtitleInfoExpanded(false);
+      }
+    };
+    document.addEventListener('click', subtitleMenuDocHandler, true);
+
+    panelEl.appendChild(subtitleInfoEl);
+    updateSubtitlePanelInfo(0, 'NO FILE');
 
     // Hidden file input
     fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = '.srt,.vtt,text/vtt,application/x-subrip';
-    fileInput.className = 've-file-input';
+    fileInput.className = 've-file-input ve-panel__file-input';
     fileInput.addEventListener('change', handleSubtitleFile);
     panelEl.appendChild(fileInput);
 
@@ -438,16 +657,32 @@
       activeVideo.removeEventListener('seeked', onVideoSeeked);
       activeVideo.removeEventListener('play', onVideoPlay);
     }
+    if (subtitleMenuDocHandler) {
+      document.removeEventListener('click', subtitleMenuDocHandler, true);
+      subtitleMenuDocHandler = null;
+    }
     panelEl = null;
     subtitleOverlay = null;
     subtitleTextEl = null;
+    subtitleInfoEl = null;
+    subtitleImportBtnEl = null;
+    subtitleMetaEl = null;
+    subtitleMetaTextEl = null;
+    subtitleProgressEl = null;
+    subtitleStatusTextEl = null;
+    subtitleIndicatorEl = null;
+    subtitleToggleEl = null;
+    subtitleMenuEl = null;
+    subtitleMenuOffsetEl = null;
     wrapperEl = null;
     fileInput = null;
     lastDisplayedText = '';
+    lastActiveCueIndex = -1;
   }
 
   function onVideoSeeked() {
     lastDisplayedText = ''; // Force subtitle refresh
+    lastActiveCueIndex = -1;
   }
 
   function onVideoPlay() {
@@ -472,12 +707,21 @@
       try {
         subtitleCues = parseSubtitle(content);
         if (subtitleCues.length === 0) {
+          loadedSubtitleName = '';
+          lastActiveCueIndex = -1;
+          updateSubtitlePanelInfo(activeVideo?.currentTime || 0);
           showToast('No cues found in subtitle file.', 'error');
         } else {
+          loadedSubtitleName = file.name;
           showToast(`Loaded ${subtitleCues.length} subtitle cues from "${file.name}"`, 'success');
           lastDisplayedText = ''; // force refresh
+          lastActiveCueIndex = -1;
+          updateSubtitlePanelInfo(activeVideo?.currentTime || 0);
         }
       } catch (err) {
+        loadedSubtitleName = '';
+        lastActiveCueIndex = -1;
+        updateSubtitlePanelInfo(activeVideo?.currentTime || 0);
         showToast('Failed to parse subtitle file.', 'error');
         console.error('[Video Enhancer] Subtitle parse error:', err);
       }
@@ -746,7 +990,10 @@
     if (panelEl) {
       const opacity = (settings.panelOpacity || 72) / 100;
       panelEl.style.background = `rgba(10, 10, 18, ${opacity})`;
-      panelEl.classList.toggle('ve-disabled', !extensionEnabled || !settings.showPanel);
+    
+    // Sync subtitle offset from settings
+    subtitleOffsetSec = settings.lyricsOffset || 0;
+    panelEl.classList.toggle('ve-disabled', !extensionEnabled || !settings.showPanel);
     }
     if (subtitleOverlay) {
       subtitleOverlay.style.bottom = (settings.subBottom || 12) + '%';
@@ -866,9 +1113,10 @@
     } else if (e.key === 's' || e.key === 'S') {
       // Toggle subtitle visibility
       if (subtitleOverlay) {
-        const isHidden = subtitleOverlay.style.display === 'none';
-        subtitleOverlay.style.display = isHidden ? '' : 'none';
-        showToast(isHidden ? 'Subtitles shown' : 'Subtitles hidden', 'info');
+        subtitleVisible = !subtitleVisible;
+        subtitleOverlay.style.display = subtitleVisible ? '' : 'none';
+        updateSubtitlePanelInfo(activeVideo?.currentTime || 0);
+        showToast(subtitleVisible ? 'Subtitles shown' : 'Subtitles hidden', 'info');
         handled = true;
       }
     }
@@ -1032,7 +1280,7 @@
 
   function injectMainWorldScript() {
     const script = document.createElement('script');
-    script.src = chrome.runtime.getURL('inject.js');
+    script.src = chrome.runtime.getURL('assets/inject.js');
     script.onload = function() {
       this.remove();
     };

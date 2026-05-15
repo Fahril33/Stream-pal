@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ================================================================
 //  ANTI-REDIRECT, OVERLAY, & JUDOL BLOCKER (Modular)
 //  Refactor v3.0 (adapted for Video Enhancer content script bridge)

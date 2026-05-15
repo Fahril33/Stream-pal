@@ -1,29 +1,25 @@
 {
   "manifest_version": 3,
   "name": "Video Enhancer",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Enhance any video player with custom controls, subtitle overlay, seek buttons, and anti-redirect protection.",
-  "permissions": [
-    "storage",
-    "activeTab"
-  ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": ["<all_urls>"],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "assets/background.js",
+    "type": "module"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["anti-redirect.js"],
+      "js": ["assets/antiRedirect.js"],
       "run_at": "document_start",
       "all_frames": true
     },
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "css": ["styles.css"],
+      "js": ["assets/content.js"],
+      "css": ["assets/content.css"],
       "run_at": "document_idle",
       "all_frames": true
     }
@@ -47,7 +43,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["styles.css", "options.css", "inject.js"],
+      "resources": ["assets/content.css", "assets/options.css", "assets/inject.js"],
       "matches": ["<all_urls>"]
     }
   ]
