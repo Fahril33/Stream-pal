@@ -31,11 +31,10 @@
   pointer-events: auto;
 }
 
-/* Show panel on hover over the wrapper */
-.ve-wrapper:hover .ve-panel,
-.ve-panel:hover {
-  opacity: 1;
-  pointer-events: auto;
+/* Highlight panel when locked */
+.ve-panel.ve-panel--locked {
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 12px rgba(99, 102, 241, 0.2);
 }
 
 /* ---------- Panel Buttons ---------- */

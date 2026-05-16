@@ -1,6 +1,7 @@
 import type { ExtensionSettings } from './types';
 
 export async function broadcastSettings(settings: ExtensionSettings): Promise<void> {
+  if (typeof chrome === 'undefined' || !chrome.tabs?.query) return;
   const tabs = await chrome.tabs.query({});
   await Promise.all(
     tabs.map((tab) =>
@@ -15,6 +16,7 @@ export async function broadcastSettings(settings: ExtensionSettings): Promise<vo
 }
 
 export async function broadcastDomainState(hostname: string, enabled: boolean): Promise<void> {
+  if (typeof chrome === 'undefined' || !chrome.tabs?.query) return;
   const tabs = await chrome.tabs.query({});
   await Promise.all(
     tabs.map((tab) => {

@@ -1,10 +1,10 @@
-# 📝 Video Enhancer — Patch Notes (v1.1)
+#  Video Enhancer — Patch Notes (v1.1)
 
 Berikut adalah daftar perubahan dan fitur baru yang ditambahkan ke ekstensi "Video Enhancer" setelah *build* awal:
 
 ---
 
-## ⚙️ 1. Halaman Pengaturan (Options Page) Lengkap
+##  1. Halaman Pengaturan (Options Page) Lengkap
 - Menambahkan **Settings UI** terpisah (`options.html`) dengan desain *premium dark glassmorphism*.
 - **Integrasi Penuh**: Pengaturan disimpan secara lokal (`chrome.storage.local`) dan disinkronisasikan ke semua tab yang terbuka secara *real-time*.
 - **Subtitle Styling**: Fitur kustomisasi ukuran font, warna teks, warna background, transparansi, shadow, dan jarak dari bawah (dilengkapi dengan *live preview*).
@@ -14,7 +14,7 @@ Berikut adalah daftar perubahan dan fitur baru yang ditambahkan ke ekstensi "Vid
 
 ---
 
-## 🛡️ 2. Peningkatan Fitur Anti-Redirect & Ad-Blocker
+## ️ 2. Peningkatan Fitur Anti-Redirect & Ad-Blocker
 - **Global Click Listener**: `click` handler untuk memblokir iklan sekarang dipasang pada `document` level dengan *capture phase* `true`. Ini memblokir klik yang mengarah ke link iklan (*ad URLs*) di **seluruh halaman**, tidak lagi hanya terbatas di area player.
 - **Invisible Overlay Destroyer (Click-jack blocker)**: Menambahkan fitur deteksi elemen transparan (`opacity: 0`, `transparent`) dengan ukuran sangat besar (menutupi >80% viewport) dan `z-index` yang tinggi. Jika elemen jebakan klik ini diklik, ekstensi akan memblokir redirect dan otomatis menghancurkan elemen tersebut (`display: none` & `pointer-events: none`).
 - **Global Pop-under Blocker**: `window.open` interceptor sekarang berjalan secara global untuk mencegah *pop-under* iklan atau popup yang membuka URL iklan.
@@ -22,7 +22,7 @@ Berikut adalah daftar perubahan dan fitur baru yang ditambahkan ke ekstensi "Vid
 
 ---
 
-## 🗑️ 3. Fitur "Block Outside Iframes"
+## ️ 3. Fitur "Block Outside Iframes"
 - Menambahkan sistem pembersih otomatis (*auto-cleanup*) untuk menghapus elemen `<iframe>` jahat atau pelacak yang di-inject di luar tag utama `<body>` (misalnya di-inject langsung ke `<html>`).
 - Fitur ini memiliki toggle khusus bernama **"Block Outside Iframes"** di halaman Settings (bagian Ad Blocker) yang bisa dihidupkan atau dimatikan.
 - Pengecekan iframe ini terikat dengan siklus `MutationObserver` dan pengecekan interval periodik, sehingga iframe yang baru muncul secara dinamis akan langsung dibersihkan.
@@ -45,7 +45,7 @@ Menambahkan dukungan *Keyboard Shortcuts* (tersedia toggle untuk on/off di Setti
 
 ---
 
-## ⚡ 6. Akses Pengaturan Cepat di Popup
+##  6. Akses Pengaturan Cepat di Popup
 - Mengembangkan tampilan **Popup** ekstensi. Kini, selain *toggle* untuk mengaktifkan ekstensi pada domain saat ini, terdapat *toggle* cepat untuk fitur-fitur umum:
   - **Auto-Pause on Tab Switch**
   - **Anti-Redirect & Ads**
@@ -57,7 +57,7 @@ Menambahkan dukungan *Keyboard Shortcuts* (tersedia toggle untuk on/off di Setti
 
 ---
 
-# 📝 Video Enhancer — Patch Notes (v1.2)
+#  Video Enhancer — Patch Notes (v1.2)
 
 ---
 
@@ -74,7 +74,7 @@ Menambahkan dukungan *Keyboard Shortcuts* (tersedia toggle untuk on/off di Setti
 
 ---
 
-## 🗑️ 8. Iframe Cleanup Disempurnakan
+## ️ 8. Iframe Cleanup Disempurnakan
 - **7 Heuristik Deteksi** untuk menentukan apakah sebuah iframe mencurigakan:
   1. Di luar `<body>` — hampir pasti malicious
   2. URL src cocok dengan daftar pola domain iklan/tracker bawaan (regex)
@@ -89,9 +89,31 @@ Menambahkan dukungan *Keyboard Shortcuts* (tersedia toggle untuk on/off di Setti
 
 ---
 
-## 🚫 9. Bypass Site Auto-Pause (Paksa Background Play)
+##  9. Bypass Site Auto-Pause (Paksa Background Play)
 - **Main-World Injection**: Menambahkan script terisolasi (`inject.js`) yang di-inject langsung ke *main world* dari halaman web.
 - **Spoofing Visibility**: Script ini memblokir pendeteksian *unfocus* (seperti `visibilitychange`, `blur`, `focus`) dan menipu API browser (`document.hidden` dan `document.visibilityState`) agar halaman web mengira Anda masih aktif melihatnya.
 - **Mencegah Jeda Paksa**: Mencegah website secara paksa melakukan jeda video (`video.pause()`) ketika Anda berpindah tab.
 - **Toggle Settings**: Fitur canggih ini dapat dihidupkan/dimatikan melalui toggle **"Bypass Site Auto-Pause"** di menu Settings (opsi ini direkomendasikan untuk situs *streaming* yang agresif mem-pause video saat backgrounding).
 
+---
+
+#  Video Enhancer — Patch Notes (v1.3)
+
+---
+
+##  10. UI Revamp & Premium Glassmorphism
+- **macOS-Style Glassmorphism**: Melakukan *revamp* (perombakan) besar pada gaya UI Options Page. Desain *card* kini memiliki efek `backdrop-filter` yang kuat (hingga `blur(40px)`) dengan highlight *inset* yang menciptakan kedalaman, sangat mirip dengan material *frosted glass* di macOS.
+- **Clean Background**: Menghilangkan efek *white noise/grain* pada layer *background* utama, memungkinkan gambar wallpaper dirender dengan sangat jernih.
+- **Global Scrollbar**: Memodernisasi *scrollbar* di seluruh aplikasi dengan desain *pill* melayang dan *track* transparan yang interaktif.
+- **Clean Navigation**: Menyembunyikan Topbar (kolom pencarian) pada halaman selain "Home" agar pengguna bisa lebih fokus ke konten pengaturan.
+
+##  11. Tema Siang / Malam (Noon & Night Mode)
+- **Mode Switcher**: Menambahkan tombol *toggle* mode interaktif dengan ikon / di pojok kiri bawah *sidebar*.
+- **Dynamic CSS Theming**: Membuat variabel CSS dinamis untuk mengubah tema warna secara *real-time*. Pada mode malam (Night), seluruh *glass card*, *sidebar*, dan *input* berubah menggunakan base warna gelap (`#0c0e1a`) dengan transparansi yang disesuaikan.
+- **High-Contrast Text**: Mengimplementasikan *text-shadow* dinamis (`rgba(255,255,255)` untuk Noon, `rgba(0,0,0)` untuk Night) di atas halaman depan, untuk memastikan teks (seperti judul situs, jam, dan *todo*) tetap sangat mudah dibaca terlepas dari seberapa ramai atau terangnya gambar *background* yang digunakan.
+
+## ️ 12. Dual Background Configuration
+- **Pengaturan Wallpaper Terpisah**: Pengguna kini dapat mengatur dua *background* yang berbeda:
+  - **Noon Background**: Aktif saat ekstensi dalam mode Siang.
+  - **Night Background**: Aktif saat ekstensi dalam mode Malam.
+- **Refactoring Layout Pengaturan**: Merapikan layout *card* pengaturan *background*, memindahkan teks keterangan, tombol "Import Image", dan tombol "Reset" ke dalam satu baris (horizontal) yang rapi, dengan hasil *preview* di bagian bawah.

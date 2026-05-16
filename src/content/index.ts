@@ -78,6 +78,9 @@ import './styles.css';
   let subtitleVisible = true;
   let syncRAF = null;
   let toastTimeout = null;
+  let activityTimeout = null;
+  let currentParent = null;
+  let panelActivityHandler = null;
   const hostname = location.hostname;
 
   // ================================================================
@@ -464,6 +467,51 @@ import './styles.css';
       }
     });
 
+    // Picture in Picture Button
+    const pipBtn = document.createElement('button');
+    pipBtn.className = 've-btn ve-panel__btn ve-panel__btn--pip';
+    pipBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><rect width="8" height="5" x="11" y="12" rx="1" ry="1"/></svg>';
+    pipBtn.title = 'Picture in Picture';
+    pipBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!activeVideo) return;
+      try {
+        if (document.pictureInPictureElement) {
+          await document.exitPictureInPicture();
+        } else {
+          await activeVideo.requestPictureInPicture();
+        }
+      } catch (err) {
+        showToast('PiP failed', 'error');
+      }
+    });
+    panelEl.appendChild(pipBtn);
+
+    // Lock Mode Button
+    const lockBtn = document.createElement('button');
+    lockBtn.className = 've-btn ve-panel__btn ve-panel__btn--lock';
+    const iconLock = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+    const iconUnlock = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>';
+    lockBtn.innerHTML = iconUnlock;
+    lockBtn.title = 'Lock Panel (Always Show)';
+    lockBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const isLocked = panelEl.classList.toggle('ve-panel--locked');
+      if (isLocked) {
+        lockBtn.innerHTML = iconLock;
+        lockBtn.title = 'Unlock Panel (Auto-hide)';
+        showToast('Panel locked', 'info');
+      } else {
+        lockBtn.innerHTML = iconUnlock;
+        lockBtn.title = 'Lock Panel (Always Show)';
+        showToast('Panel auto-hide', 'info');
+        if (panelActivityHandler) panelActivityHandler();
+      }
+    });
+    panelEl.appendChild(lockBtn);
+
     // Divider before subtitle button
     const divider2 = document.createElement('span');
     divider2.className = 've-divider ve-panel__divider ve-panel__divider--before-subtitle';
@@ -624,13 +672,40 @@ import './styles.css';
     if (parent) {
       parent.appendChild(panelEl);
       parent.appendChild(subtitleOverlay);
-
-      // Make parent a hover target
       parent.classList.add('ve-wrapper');
+      currentParent = parent;
     } else {
       document.body.appendChild(panelEl);
       document.body.appendChild(subtitleOverlay);
+      currentParent = document.body;
     }
+
+    // Auto-hide activity tracker
+    panelActivityHandler = () => {
+      if (!panelEl) return;
+      panelEl.classList.add('ve-visible');
+      clearTimeout(activityTimeout);
+      if (!panelEl.classList.contains('ve-panel--locked')) {
+        activityTimeout = setTimeout(() => {
+          if (panelEl && !panelEl.classList.contains('ve-panel--locked')) {
+            panelEl.classList.remove('ve-visible');
+          }
+        }, 2500);
+      }
+    };
+
+    if (currentParent) {
+      currentParent.addEventListener('mousemove', panelActivityHandler);
+      currentParent.addEventListener('click', panelActivityHandler);
+    }
+    panelEl.addEventListener('mouseenter', () => {
+      clearTimeout(activityTimeout);
+      panelEl.classList.add('ve-visible');
+    });
+    panelEl.addEventListener('mouseleave', () => {
+      if (panelActivityHandler) panelActivityHandler();
+    });
+    panelActivityHandler();
 
     // Start subtitle sync loop
     if (syncRAF) cancelAnimationFrame(syncRAF);
@@ -643,6 +718,14 @@ import './styles.css';
   }
 
   function destroyUI() {
+    if (currentParent && panelActivityHandler) {
+      currentParent.removeEventListener('mousemove', panelActivityHandler);
+      currentParent.removeEventListener('click', panelActivityHandler);
+    }
+    clearTimeout(activityTimeout);
+    panelActivityHandler = null;
+    currentParent = null;
+
     if (panelEl && panelEl.parentNode) {
       panelEl.parentNode.removeChild(panelEl);
     }

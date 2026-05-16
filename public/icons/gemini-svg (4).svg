@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" width="100%" height="100%">
+  <defs>
+    <style>
+      /* Mengimpor font dengan gaya rounded bold yang sangat mirip dengan gambar asli */
+      @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@900&amp;display=swap');
+      
+      .logo-text {
+        font-family: 'Nunito', sans-serif;
+        font-size: 150px;
+        font-weight: 900;
+        fill: #ffffff; /* Warna putih presisi sesuai gambar awal */
+        letter-spacing: -2px;
+      }
+    </style>
+  </defs>
+  
+  <text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" class="logo-text">MeTime</text>
+</svg>
