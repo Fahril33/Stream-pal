@@ -117,3 +117,10 @@ Menambahkan dukungan *Keyboard Shortcuts* (tersedia toggle untuk on/off di Setti
   - **Noon Background**: Aktif saat ekstensi dalam mode Siang.
   - **Night Background**: Aktif saat ekstensi dalam mode Malam.
 - **Refactoring Layout Pengaturan**: Merapikan layout *card* pengaturan *background*, memindahkan teks keterangan, tombol "Import Image", dan tombol "Reset" ke dalam satu baris (horizontal) yang rapi, dengan hasil *preview* di bagian bawah.
+
+---
+
+## ✅ 13. Todo Watchlist UX Ditingkatkan
+- **Dipisah 2 Card**: Todo kini dipisah menjadi **Pending** dan **Done** agar lebih jelas.
+- **Urutan Done Paling Baru**: Daftar **Done** diurutkan berdasarkan todo yang paling baru selesai (completion terbaru).
+- **Readability Lebih Baik**: Kontras teks + *shadow* disesuaikan supaya tetap terbaca meskipun warna wallpaper mirip.

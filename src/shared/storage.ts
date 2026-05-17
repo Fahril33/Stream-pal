@@ -130,7 +130,26 @@ export async function setUiMode(mode: "noon" | "night"): Promise<void> {
   await setLocal("ve_ui_mode", mode);
 }
 
-export type CustomLinkType = "film" | "musik" | "tools";
+export async function getLanguage(): Promise<"id" | "en"> {
+  const v = await getLocal<string>("ve_lang");
+  return v === "en" ? "en" : "id";
+}
+
+export async function setLanguage(lang: "id" | "en"): Promise<void> {
+  await setLocal("ve_lang", lang);
+}
+
+export async function getHeroName(): Promise<string> {
+  const v = await getLocal<string>("ve_hero_name");
+  return typeof v === "string" && v.trim().length > 0 ? v.trim() : "Streamer";
+}
+
+export async function setHeroName(name: string): Promise<void> {
+  const next = (name || "").trim().slice(0, 32);
+  await setLocal("ve_hero_name", next.length > 0 ? next : "Streamer");
+}
+
+export type CustomLinkType = "movie" | "musik" | "tools";
 export type ThumbnailType = "default" | "link";
 
 export type CustomLink = {
@@ -144,24 +163,154 @@ export type CustomLink = {
   type: CustomLinkType;
   thumbnailType: ThumbnailType;
 };
+
+function normalizeCustomLinkType(type: unknown): CustomLinkType {
+  if (type === "film") return "movie";
+  if (type === "movie" || type === "musik" || type === "tools") return type;
+  return "movie";
+}
+
+function normalizeCustomLinks(links: CustomLink[]): CustomLink[] {
+  return links.map((l) => ({
+    ...l,
+    type: normalizeCustomLinkType((l as unknown as { type?: unknown })?.type),
+  }));
+}
 export async function getCustomLinks(): Promise<CustomLink[]> {
   const v = await getLocal<CustomLink[]>("ve_custom_links_v2");
-  if (Array.isArray(v) && v.length > 0) return v;
-  return [
-    { id: "1", title: "Z1.idlixku.com", url: "https://z1.idlixku.com/", type: "film", thumbnailType: "default" },
-    { id: "2", title: "Ngefilm.ink", url: "https://ngefilm.ink/", type: "film", thumbnailType: "default" },
-    { id: "3", title: "D21.team", url: "https://d21.team/", type: "film", thumbnailType: "default" },
-    { id: "4", title: "Rebahinxxxi3.beauty", url: "https://rebahinxxxi3.beauty/", type: "film", thumbnailType: "link" },
-    { id: "5", title: "Pahe.ink", url: "https://pahe.ink/", type: "film", thumbnailType: "link" },
-    { id: "6", title: "Cineby.sc", url: "https://cineby.sc/", type: "film", thumbnailType: "link" },
-    { id: "7", title: "Yomi.to", url: "https://yomi.to/", type: "film", thumbnailType: "link" },
-    { id: "8", title: "Anikuro.to", url: "https://anikuro.to/", type: "film", thumbnailType: "link" },
-    { id: "9", title: "Streamxtv.tech", url: "https://streamxtv.tech/", type: "film", thumbnailType: "link" },
-    { id: "10", title: "Dl.opensubtitles.com", url: "https://dl.opensubtitles.com/", type: "tools", thumbnailType: "link" },
+  const defaults: CustomLink[] = [
+    {
+      id: "1",
+      title: "IDLIX",
+      url: "https://z1.idlixku.com/",
+      type: "movie",
+      thumbnailType: "default",
+    },
+    {
+      id: "2",
+      title: "NGEFILM",
+      url: "https://ngefilm.ink/",
+      type: "movie",
+      thumbnailType: "default",
+    },
+    {
+      id: "3",
+      title: "LAYARKACA21",
+      url: "https://d21.team/",
+      type: "movie",
+      thumbnailType: "default",
+    },
+    {
+      id: "4",
+      title: "REBAHIN",
+      url: "https://rebahinxxi3.beauty/",
+      type: "movie",
+      thumbnailType: "link",
+    },
+    {
+      id: "5",
+      title: "PAHE",
+      url: "https://pahe.ink/",
+      type: "movie",
+      thumbnailType: "link",
+    },
+    {
+      id: "6",
+      title: "CINEBY",
+      url: "https://cineby.sc/",
+      type: "movie",
+      thumbnailType: "link",
+    },
+    {
+      id: "7",
+      title: "YOMI",
+      url: "https://yomi.to/",
+      type: "movie",
+      thumbnailType: "link",
+    },
+    {
+      id: "8",
+      title: "ANIKURO",
+      url: "https://anikuro.to/",
+      type: "movie",
+      thumbnailType: "link",
+    },
+    {
+      id: "9",
+      title: "STREAMXTV",
+      url: "https://streamxtv.tech/",
+      type: "movie",
+      thumbnailType: "link",
+    },
+    {
+      id: "10",
+      title: "OPEN SUBTITLE",
+      url: "https://dl.opensubtitles.com/",
+      type: "tools",
+      thumbnailType: "link",
+    },
+    {
+      id: "11",
+      title: "TELEGRAM",
+      url: "https://web.telegram.org/k/",
+      type: "tools",
+      thumbnailType: "link",
+    },
+    {
+      id: "12",
+      title: "WHATSAPP",
+      url: "https://web.whatsapp.com/",
+      type: "tools",
+      thumbnailType: "link",
+    },
+    {
+      id: "13",
+      title: "Spotify",
+      url: "https://open.spotify.com/",
+      type: "musik",
+      thumbnailType: "link",
+    },
+    {
+      id: "14",
+      title: "NETFLIX",
+      url: "https://www.netflix.com/",
+      type: "movie",
+      thumbnailType: "link",
+    },
+    {
+      id: "15",
+      title: "YouTube Music",
+      url: "https://music.youtube.com/",
+      type: "musik",
+      thumbnailType: "link",
+    },
   ];
+
+  if (Array.isArray(v) && v.length > 0) {
+    const normalized = normalizeCustomLinks(v);
+    
+    // Check if any default links are missing in existing list (by URL prefix/match)
+    const existingUrls = new Set(
+      normalized.map((l) => l.url.trim().toLowerCase().replace(/\/$/, ""))
+    );
+    
+    const missingDefaults = defaults.filter(
+      (d) => !existingUrls.has(d.url.trim().toLowerCase().replace(/\/$/, ""))
+    );
+
+    if (missingDefaults.length > 0) {
+      const merged = [...normalized, ...missingDefaults];
+      await saveCustomLinks(merged);
+      return merged;
+    }
+    
+    return normalized;
+  }
+
+  return defaults;
 }
 export async function saveCustomLinks(links: CustomLink[]): Promise<void> {
-  await setLocal("ve_custom_links_v2", links);
+  await setLocal("ve_custom_links_v2", normalizeCustomLinks(links));
 }
 
 export async function getLinkViewMode(): Promise<"card" | "list"> {
@@ -170,4 +319,23 @@ export async function getLinkViewMode(): Promise<"card" | "list"> {
 }
 export async function setLinkViewMode(mode: "card" | "list"): Promise<void> {
   await setLocal("ve_link_view_mode", mode);
+}
+
+const TODO_WATCHLIST_KEY = "ve_todo_watchlist_v1";
+
+export type TodoWatchItem = {
+  id: string;
+  text: string;
+  done: boolean;
+  createdAt: number;
+  updatedAt: number;
+};
+
+export async function getTodoWatchlist(): Promise<TodoWatchItem[]> {
+  const v = await getLocal<TodoWatchItem[]>(TODO_WATCHLIST_KEY);
+  return Array.isArray(v) ? v.filter(Boolean) : [];
+}
+
+export async function saveTodoWatchlist(items: TodoWatchItem[]): Promise<void> {
+  await setLocal(TODO_WATCHLIST_KEY, items);
 }

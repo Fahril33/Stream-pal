@@ -292,6 +292,16 @@ body {
   align-items: center;
   justify-content: space-between;
 }
+.footer-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.lang-pill {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
 
 .mode-toggle-btn {
   width: 36px;
@@ -565,6 +575,49 @@ body {
   color: var(--text-primary);
   text-shadow: 0 1px 8px rgba(255, 255, 255, 0.5);
 }
+.hero-name-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.hero-name-btn:hover {
+  color: var(--accent);
+}
+.hero-name-btn:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.35);
+  outline-offset: 3px;
+}
+.hero-name-input {
+  width: 180px;
+  max-width: 60vw;
+  font: inherit;
+  font-weight: 900;
+  font-size: 26px;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 4px 10px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.hero-name-input:focus {
+  outline: none;
+  border-color: rgba(59, 130, 246, 0.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 0 0 4px rgba(59, 130, 246, 0.12);
+}
 .hero-subtitle {
   margin-top: 8px;
   color: var(--text-secondary);
@@ -648,7 +701,7 @@ body {
     box-shadow var(--transition),
     background var(--transition);
   background: rgba(255, 255, 255, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: none;
   box-shadow:
     0 0 0 0.5px var(--border-outer),
     0 2px 8px rgba(0, 0, 0, 0.04);
@@ -685,7 +738,7 @@ body {
   overflow: hidden;
   text-decoration: none;
   color: inherit;
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: none;
   background: rgba(255, 255, 255, 0.45);
   box-shadow:
     0 0 0 0.5px var(--border-outer),
@@ -702,7 +755,6 @@ body {
 }
 .site-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.68);
   box-shadow:
     0 0 0 0.5px var(--border-outer),
     0 14px 36px rgba(15, 23, 42, 0.1),
@@ -892,30 +944,425 @@ body {
   display: block;
 }
 
-.todo-list {
+.todo-sections {
   margin-top: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-.todo {
+
+.todo-card {
   border-radius: 16px;
   padding: 12px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.todo-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.todo-card-title {
+  font-size: 12.5px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  text-shadow: 0 1px 6px rgba(255, 255, 255, 0.45);
+}
+
+.todo-card-meta {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.todo-checklist {
+  --background: rgba(255, 255, 255, 0.5);
+  --text: var(--text-primary);
+  --check: #4f29f0;
+  --disabled: rgba(65, 72, 86, 0.55);
+  --border-radius: 14px;
+  background: var(--background);
+  width: 100%;
+  border-radius: var(--border-radius);
+  position: relative;
+  box-shadow: 0 10px 30px rgba(65, 72, 86, 0.05);
+  padding: 10px 10px;
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 30px auto 28px;
+  align-items: center;
+  column-gap: 0;
+  row-gap: 8px;
+  max-height: 500px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.todo-checklist label {
+  color: var(--text);
+  position: relative;
+  cursor: pointer;
+  display: grid;
+  align-items: center;
+  width: fit-content;
+  transition: color 0.3s ease;
+  margin-right: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  text-shadow: 0 1px 6px rgba(255, 255, 255, 0.45);
+}
+
+.todo-checklist label::before,
+.todo-checklist label::after {
+  content: "";
+  position: absolute;
+}
+
+.todo-checklist label::before {
+  height: 2px;
+  width: 8px;
+  left: -27px;
+  background: var(--check);
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+.todo-checklist label:after {
+  height: 4px;
+  width: 4px;
+  top: 8px;
+  left: -25px;
+  border-radius: 50%;
+}
+
+.todo-checklist input[type="checkbox"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  position: relative;
+  height: 15px;
+  width: 15px;
+  outline: none;
+  border: 0;
+  margin: 0 15px 0 0;
+  cursor: pointer;
+  background: transparent;
+  display: grid;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.todo-checklist input[type="checkbox"]::before,
+.todo-checklist input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  height: 2px;
+  top: auto;
+  background: var(--check);
+  border-radius: 2px;
+}
+
+.todo-checklist input[type="checkbox"]::before {
+  width: 0px;
+  right: 60%;
+  transform-origin: right bottom;
+}
+
+.todo-checklist input[type="checkbox"]::after {
+  width: 0px;
+  left: 40%;
+  transform-origin: left bottom;
+}
+
+.todo-checklist input[type="checkbox"]:checked::before {
+  width: 5px;
+  top: 8px;
+  transform: rotate(45deg);
+}
+
+.todo-checklist input[type="checkbox"]:checked::after {
+  width: 10px;
+  top: 8px;
+  transform: rotate(-45deg);
+}
+
+.todo-checklist input[type="checkbox"]:checked + label {
+  color: var(--disabled);
+}
+
+.todo-checklist input[type="checkbox"]:checked + label::before {
+  background: var(--disabled);
+  width: 100%;
+  left: -2px;
+}
+
+.todo-checklist input[type="checkbox"][data-animate="1"]:checked::before {
+  animation: checklist-check-01 0.4s ease forwards;
+}
+
+.todo-checklist input[type="checkbox"][data-animate="1"]:checked::after {
+  animation: checklist-check-02 0.4s ease forwards;
+}
+
+.todo-checklist input[type="checkbox"][data-animate="1"]:checked + label {
+  animation: checklist-move 0.3s ease 0.1s forwards;
+}
+
+.todo-checklist input[type="checkbox"][data-animate="1"]:checked + label::before {
+  animation: checklist-slice 0.4s ease forwards;
+}
+
+.todo-checklist input[type="checkbox"][data-animate="1"]:checked + label::after {
+  animation: checklist-firework 0.5s ease forwards 0.1s;
+}
+
+@keyframes checklist-move {
+  50% {
+    padding-left: 8px;
+    padding-right: 0px;
+  }
+
+  100% {
+    padding-right: 4px;
+  }
+}
+
+@keyframes checklist-slice {
+  60% {
+    width: 100%;
+    left: 4px;
+  }
+
+  100% {
+    width: 100%;
+    left: -2px;
+    padding-left: 0;
+  }
+}
+
+@keyframes checklist-check-01 {
+  0% {
+    width: 4px;
+    top: auto;
+    transform: rotate(0);
+  }
+
+  50% {
+    width: 0px;
+    top: auto;
+    transform: rotate(0);
+  }
+
+  51% {
+    width: 0px;
+    top: 8px;
+    transform: rotate(45deg);
+  }
+
+  100% {
+    width: 5px;
+    top: 8px;
+    transform: rotate(45deg);
+  }
+}
+
+@keyframes checklist-check-02 {
+  0% {
+    width: 4px;
+    top: auto;
+    transform: rotate(0);
+  }
+
+  50% {
+    width: 0px;
+    top: auto;
+    transform: rotate(0);
+  }
+
+  51% {
+    width: 0px;
+    top: 8px;
+    transform: rotate(-45deg);
+  }
+
+  100% {
+    width: 10px;
+    top: 8px;
+    transform: rotate(-45deg);
+  }
+}
+
+@keyframes checklist-firework {
+  0% {
+    opacity: 1;
+    box-shadow:
+      0 0 0 -2px #4f29f0,
+      0 0 0 -2px #4f29f0,
+      0 0 0 -2px #4f29f0,
+      0 0 0 -2px #4f29f0,
+      0 0 0 -2px #4f29f0,
+      0 0 0 -2px #4f29f0;
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    box-shadow:
+      0 -15px 0 0px #4f29f0,
+      14px -8px 0 0px #4f29f0,
+      14px 8px 0 0px #4f29f0,
+      0 15px 0 0px #4f29f0,
+      -14px 8px 0 0px #4f29f0,
+      -14px -8px 0 0px #4f29f0;
+  }
+}
+
+.todo-add {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.todo-add .search-input {
+  flex: 1;
+}
+.todo-add--head {
+  margin-top: 0;
+}
+
+.todo-actions {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.todo-split-btn {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.todo-split-caret {
+  width: 22px;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.18) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.todo-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 170px;
+  z-index: 50;
+  border-radius: 12px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
+.todo-menu-item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-primary);
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 13px;
+}
+.todo-menu-item:hover {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.todo-import-preview {
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.35);
+  padding: 10px 10px;
+  max-height: 240px;
+  overflow: auto;
+}
+.todo-import-row {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 8px 6px;
+  border-radius: 10px;
 }
-.todo-dot {
-  width: 10px;
-  height: 10px;
+.todo-import-row + .todo-import-row {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+.todo-import-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  padding: 0 10px;
   border-radius: 999px;
-  background: rgba(59, 130, 246, 0.4);
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+  font-weight: 800;
+  font-size: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
 }
-.todo-text {
-  font-size: 13px;
+.todo-import-pill.is-pending {
+  background: rgba(37, 99, 235, 0.14);
+  color: rgba(37, 99, 235, 0.95);
+}
+.todo-import-pill.is-done {
+  background: rgba(16, 185, 129, 0.14);
+  color: rgba(16, 185, 129, 0.95);
+}
+.todo-import-text {
+  color: var(--text-primary);
   font-weight: 700;
-  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.todo-import-more {
+  padding: 8px 6px 2px;
+  color: var(--text-muted);
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.todo-remove {
+  justify-self: end;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 800;
+  line-height: 1;
+}
+.todo-remove:hover {
+  background: rgba(255, 255, 255, 0.45);
+  color: var(--text-primary);
 }
 
 .empty-state {
@@ -1310,6 +1757,48 @@ body {
   color: var(--text-muted);
   margin-bottom: 16px;
 }
+.social-links {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.social-link {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.4);
+  color: var(--text-primary);
+  text-decoration: none;
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
+    background var(--transition),
+    border-color var(--transition);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 4px 14px rgba(0, 0, 0, 0.06);
+}
+.social-link svg {
+  width: 20px;
+  height: 20px;
+}
+.social-link:hover {
+  transform: translateY(-1px);
+  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 10px 22px rgba(0, 0, 0, 0.1);
+}
+.social-link:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.35);
+  outline-offset: 2px;
+}
 .about-desc {
   font-size: 13px;
   color: var(--text-secondary);
@@ -1501,7 +1990,7 @@ body {
 .app[data-mode="night"] .site-card,
 .app[data-mode="night"] .list-link-item {
   background: rgba(15, 20, 35, 0.5);
-  border-color: rgba(255, 255, 255, 0.08);
+  border: none;
   box-shadow:
     0 0 0 0.5px rgba(255, 255, 255, 0.04),
     0 6px 20px rgba(0, 0, 0, 0.2);
@@ -1509,7 +1998,6 @@ body {
 .app[data-mode="night"] .site-card:hover,
 .app[data-mode="night"] .list-link-item:hover {
   background: rgba(20, 28, 50, 0.62);
-  border-color: rgba(255, 255, 255, 0.12);
 }
 .app[data-mode="night"] .site-card-thumb {
   background-color: rgba(0, 0, 0, 0.3);
@@ -1539,6 +2027,26 @@ body {
 .app[data-mode="night"] .modal-preview {
   border-color: rgba(255, 255, 255, 0.06);
   background: rgba(0, 0, 0, 0.2);
+}
+
+.app[data-mode="night"] .todo-menu {
+  background: rgba(15, 20, 35, 0.92);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+.app[data-mode="night"] .todo-menu-item {
+  color: var(--text-primary);
+}
+.app[data-mode="night"] .todo-menu-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.app[data-mode="night"] .todo-import-preview {
+  background: rgba(15, 20, 35, 0.35);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.app[data-mode="night"] .todo-import-row + .todo-import-row {
+  border-top-color: rgba(255, 255, 255, 0.08);
 }
 
 .app[data-mode="night"] .side-nav-item {
@@ -1628,6 +2136,43 @@ body {
   border-color: rgba(255, 255, 255, 0.06);
 }
 
+.app[data-mode="night"] .todo-card {
+  background: rgba(12, 14, 26, 0.48);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.app[data-mode="night"] .todo-card-meta {
+  background: rgba(12, 14, 26, 0.55);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.app[data-mode="night"] .todo-card-title {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
+}
+
+.app[data-mode="night"] .todo-checklist {
+  --background: rgba(12, 14, 26, 0.6);
+  --text: rgba(255, 255, 255, 0.92);
+  --disabled: rgba(255, 255, 255, 0.38);
+}
+
+.app[data-mode="night"] .todo-checklist label {
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.65);
+}
+
+.app[data-mode="night"] .social-link {
+  background: rgba(12, 14, 26, 0.55);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 8px 18px rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.92);
+}
+.app[data-mode="night"] .social-link:hover {
+  background: rgba(12, 14, 26, 0.7);
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
 .app[data-mode="night"] .home-link-card {
   background: rgba(59, 130, 246, 0.08);
   border-color: rgba(255, 255, 255, 0.08);
@@ -1677,6 +2222,21 @@ body {
 }
 .app[data-mode="night"] .panel-head p {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.app[data-mode="night"] .hero-name-btn:hover {
+  color: var(--accent-light);
+}
+.app[data-mode="night"] .hero-name-input {
+  background: rgba(12, 14, 26, 0.55);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.92);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.app[data-mode="night"] .hero-name-input:focus {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 4px rgba(59, 130, 246, 0.12);
 }
 
 .app[data-mode="night"] .chat-link-card,
