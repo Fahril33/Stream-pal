@@ -22,10 +22,16 @@ import './styles.css';
   const DEFAULT_SETTINGS = {
     globalEnabled: true,
     showPanel: true,
+    panelPreview: false,
     autoDetect: true,
     autoPause: false,
     bypassSiteAutoPause: false,
     panelOpacity: 72,
+    enablePictureInPicture: true,
+    enableExternalSubtitle: true,
+    enableJump: true,
+    jumpSmallSeconds: 5,
+    jumpLargeSeconds: 60,
     subFontSize: 22,
     subFontColor: '#ffffff',
     subBgColor: '#000000',
@@ -435,6 +441,32 @@ import './styles.css';
       { label: '+1m', delta: 60 },
     ];
 
+    const enableJump = settings.enableJump !== false;
+    const jumpSmallSeconds =
+      typeof settings.jumpSmallSeconds === 'number' && Number.isFinite(settings.jumpSmallSeconds)
+        ? Math.max(1, Math.min(120, Math.round(settings.jumpSmallSeconds)))
+        : 5;
+    const jumpLargeSeconds =
+      typeof settings.jumpLargeSeconds === 'number' && Number.isFinite(settings.jumpLargeSeconds)
+        ? Math.max(5, Math.min(600, Math.round(settings.jumpLargeSeconds)))
+        : 60;
+
+    const formatJumpLabel = (deltaSeconds) => {
+      const abs = Math.abs(deltaSeconds);
+      const sign = deltaSeconds < 0 ? '−' : '+';
+      if (abs >= 60 && abs % 60 === 0) return `${sign}${abs / 60}m`;
+      return `${sign}${abs}s`;
+    };
+
+    if (!enableJump) {
+      seekButtons.length = 0;
+    } else {
+      seekButtons[0] = { label: formatJumpLabel(-jumpLargeSeconds), delta: -jumpLargeSeconds };
+      seekButtons[1] = { label: formatJumpLabel(-jumpSmallSeconds), delta: -jumpSmallSeconds };
+      seekButtons[2] = { label: formatJumpLabel(jumpSmallSeconds), delta: jumpSmallSeconds };
+      seekButtons[3] = { label: formatJumpLabel(jumpLargeSeconds), delta: jumpLargeSeconds };
+    }
+
     seekButtons.forEach((btn, idx) => {
       const el = document.createElement('button');
       el.className = 've-btn ve-panel__btn ve-panel__btn--seek';
@@ -468,33 +500,39 @@ import './styles.css';
     });
 
     // Picture in Picture Button
-    const pipBtn = document.createElement('button');
-    pipBtn.className = 've-btn ve-panel__btn ve-panel__btn--pip';
-    pipBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><rect width="8" height="5" x="11" y="12" rx="1" ry="1"/></svg>';
-    pipBtn.title = 'Picture in Picture';
-    pipBtn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!activeVideo) return;
-      try {
-        if (document.pictureInPictureElement) {
-          await document.exitPictureInPicture();
-        } else {
-          await activeVideo.requestPictureInPicture();
+    if (settings.enablePictureInPicture !== false) {
+      const pipBtn = document.createElement('button');
+      pipBtn.className = 've-btn ve-panel__btn ve-panel__btn--pip';
+      pipBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><rect width="8" height="5" x="11" y="12" rx="1" ry="1"/></svg>';
+      pipBtn.title = 'Picture in Picture';
+      pipBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!activeVideo) return;
+        try {
+          if (document.pictureInPictureElement) {
+            await document.exitPictureInPicture();
+          } else {
+            await activeVideo.requestPictureInPicture();
+          }
+        } catch (err) {
+          showToast('PiP failed', 'error');
         }
-      } catch (err) {
-        showToast('PiP failed', 'error');
-      }
-    });
-    panelEl.appendChild(pipBtn);
+      });
+      panelEl.appendChild(pipBtn);
+    }
 
     // Lock Mode Button
     const lockBtn = document.createElement('button');
     lockBtn.className = 've-btn ve-panel__btn ve-panel__btn--lock';
     const iconLock = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
     const iconUnlock = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>';
-    lockBtn.innerHTML = iconUnlock;
-    lockBtn.title = 'Lock Panel (Always Show)';
+    const panelLockedByDefault = Boolean(settings.panelPreview);
+    panelEl.classList.toggle('ve-panel--locked', panelLockedByDefault);
+    lockBtn.innerHTML = panelLockedByDefault ? iconLock : iconUnlock;
+    lockBtn.title = panelLockedByDefault
+      ? 'Unlock Panel (Auto-hide)'
+      : 'Lock Panel (Always Show)';
     lockBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -512,22 +550,23 @@ import './styles.css';
     });
     panelEl.appendChild(lockBtn);
 
-    // Divider before subtitle button
-    const divider2 = document.createElement('span');
-    divider2.className = 've-divider ve-panel__divider ve-panel__divider--before-subtitle';
-    panelEl.appendChild(divider2);
+    if (settings.enableExternalSubtitle !== false) {
+      // Divider before subtitle button
+      const divider2 = document.createElement('span');
+      divider2.className = 've-divider ve-panel__divider ve-panel__divider--before-subtitle';
+      panelEl.appendChild(divider2);
 
-    // Subtitle import + status (single container)
-    subtitleInfoEl = document.createElement('div');
-    subtitleInfoEl.className = 've-subtitle-info ve-panel__subtitle-info ve-subtitle-info--collapsed';
-    subtitleInfoEl.title = 'Subtitle controls';
-    subtitleInfoEl.addEventListener('mouseenter', () => setSubtitleInfoExpanded(true));
-    subtitleInfoEl.addEventListener('mouseleave', () => {
-      const isMenuOpen = subtitleMenuEl && subtitleMenuEl.classList.contains('ve-subtitle-menu--open');
-      if (!isMenuOpen) {
-        setSubtitleInfoExpanded(false);
-      }
-    });
+      // Subtitle import + status (single container)
+      subtitleInfoEl = document.createElement('div');
+      subtitleInfoEl.className = 've-subtitle-info ve-panel__subtitle-info ve-subtitle-info--collapsed';
+      subtitleInfoEl.title = 'Subtitle controls';
+      subtitleInfoEl.addEventListener('mouseenter', () => setSubtitleInfoExpanded(true));
+      subtitleInfoEl.addEventListener('mouseleave', () => {
+        const isMenuOpen = subtitleMenuEl && subtitleMenuEl.classList.contains('ve-subtitle-menu--open');
+        if (!isMenuOpen) {
+          setSubtitleInfoExpanded(false);
+        }
+      });
 
     subtitleImportBtnEl = document.createElement('button');
     subtitleImportBtnEl.className = 've-btn ve-btn--accent ve-panel__btn ve-panel__btn--subtitle ve-subtitle-info__import';
@@ -667,16 +706,17 @@ import './styles.css';
     subtitleTextEl.className = 've-subtitle-text';
     applySubtitleStyles(subtitleTextEl);
     subtitleOverlay.appendChild(subtitleTextEl);
+    }
 
     // -- Attach to DOM --
     if (parent) {
       parent.appendChild(panelEl);
-      parent.appendChild(subtitleOverlay);
+      if (subtitleOverlay) parent.appendChild(subtitleOverlay);
       parent.classList.add('ve-wrapper');
       currentParent = parent;
     } else {
       document.body.appendChild(panelEl);
-      document.body.appendChild(subtitleOverlay);
+      if (subtitleOverlay) document.body.appendChild(subtitleOverlay);
       currentParent = document.body;
     }
 
@@ -708,13 +748,15 @@ import './styles.css';
     panelActivityHandler();
 
     // Start subtitle sync loop
-    if (syncRAF) cancelAnimationFrame(syncRAF);
-    lastDisplayedText = '';
-    syncRAF = requestAnimationFrame(syncSubtitles);
+    if (subtitleOverlay) {
+      if (syncRAF) cancelAnimationFrame(syncRAF);
+      lastDisplayedText = '';
+      syncRAF = requestAnimationFrame(syncSubtitles);
 
-    // Listen for video events to re-sync on seek
-    video.addEventListener('seeked', onVideoSeeked);
-    video.addEventListener('play', onVideoPlay);
+      // Listen for video events to re-sync on seek
+      video.addEventListener('seeked', onVideoSeeked);
+      video.addEventListener('play', onVideoPlay);
+    }
   }
 
   function destroyUI() {
@@ -1138,6 +1180,7 @@ import './styles.css';
             (response) => {
               if (chrome.runtime.lastError) return;
               extensionEnabled = response?.enabled ?? true;
+              createPanel();
               applySettingsToUI();
             }
           );
@@ -1145,6 +1188,7 @@ import './styles.css';
           extensionEnabled = true;
         }
       }
+      createPanel();
       applySettingsToUI();
     }
   });

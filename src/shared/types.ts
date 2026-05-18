@@ -1,10 +1,16 @@
 export type ExtensionSettings = {
   globalEnabled: boolean;
   showPanel: boolean;
+  panelPreview: boolean;
   autoDetect: boolean;
   autoPause: boolean;
   bypassSiteAutoPause: boolean;
   panelOpacity: number;
+  enablePictureInPicture: boolean;
+  enableExternalSubtitle: boolean;
+  enableJump: boolean;
+  jumpSmallSeconds: number;
+  jumpLargeSeconds: number;
   subFontSize: number;
   subFontColor: string;
   subBgColor: string;
